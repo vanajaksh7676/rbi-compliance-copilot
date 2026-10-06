@@ -1,0 +1,15 @@
+requests
+beautifulsoup4
+pymupdf
+fastembed
+numpy
+rank-bm25
+chromadb
+groq
+langchain-google-genai
+ragas
+streamlit
+python-dotenv
+pytest
+dotenv
+groq
