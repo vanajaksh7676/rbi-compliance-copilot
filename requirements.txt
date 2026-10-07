@@ -13,3 +13,8 @@ python-dotenv
 pytest
 dotenv
 groq
+requests
+bs4
+pymupdf
+pytest
+
