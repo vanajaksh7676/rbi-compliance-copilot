@@ -1,7 +1,7 @@
 
 
 """Split the downloaded RBI PDFs into paragraph-sized chunks and save them to
-data/processed/chunks.json."""
+data/processed/chunksand.json."""
 import csv
 import json
 import re
