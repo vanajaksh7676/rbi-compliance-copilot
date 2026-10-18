@@ -1,0 +1,136 @@
+BEFORE: raw text that PyMuPDF gives for 148MD.pdf, page 3
+========================================================================
+3 
+In exercise of the powers conferred by Section 35 A of the Banking 
+Regulation Act, 1949, and all other provisions / laws enabling the Reserve Bank of 
+India (‘RBI’) in this regard, RBI being satisfied that it is necessary and expedient in the 
+public interest so to do, hereby, issues the Directions hereinafter specified.  
+Chapter I – Preliminary 
+A. Short Title and Commencement 
+1. 
+These Directions shall be called the Reserve Bank of India (Commercial Banks 
+– Undertaking of Financial Services) Directions, 2025. 
+2. 
+1These Directions shall come into force with immediate effect. 
+B. Applicability 
+3. 
+These Directions shall be applicable to Commercial Banks (hereinafter 
+collectively referred to as 'banks' and individually as a 'bank'). 
+For the purpose of these Directions, ‘Commercial Banks’ mean banking 
+companies (other than Small Finance Banks, Payment Banks, and Local Area 
+Banks), corresponding new banks, and the State Bank of India, as defined 
+respectively under clauses (c), (da), and (nc) of Section 5 of the Banking 
+Regulation Act, 1949. 2Paragraph 18(4) of these directions shall apply to all Non-
+Banking Financial Companies (including Housing Finance Companies) which 
+are group entities of a bank operating in India. 
+C. Definitions 
+4. 
+In these directions, unless the context otherwise requires, the terms herein shall 
+bear the meanings assigned to them below: 
+(1) 
+3‘Agency Business’ means an arrangement under which a bank or its 
+group entity acts as an agent of a third-party product or service provider 
+ 
+1 Modified w.e.f. January 01, 2026.  
+2 Amended w.e.f. December 05, 2025 vide Reserve Bank of India (Commercial Banks- Undertaking of Financial 
+Services) amendment Directions, 2025 
+3 Amended w.e.f. December 05, 2025 vide Reserve Bank of India (Commercial Banks- Undertaking of Financial 
+Services) Amendment Directions, 2025.
+
+AFTER: the clean chunks made from that page
+========================================================================
+
+--- para 1 (part 1 of 1), page 3
+section: Chapter I – Preliminary > A. Short Title and Commencement
+These Directions shall be called the Reserve Bank of India (Commercial Banks – Undertaking of Financial Services) Directions, 2025.
+
+--- para 2 (part 1 of 1), page 3
+section: Chapter I – Preliminary > A. Short Title and Commencement
+These Directions shall come into force with immediate effect.
+NOTE: Footnote 1: Modified w.e.f. January 01, 2026.
+
+--- para 3 (part 1 of 1), page 3
+section: Chapter I – Preliminary > B. Applicability
+These Directions shall be applicable to Commercial Banks (hereinafter collectively referred to as 'banks' and individually as a 'bank'). For the purpose of these Directions, 'Commercial Banks' mean banking companies (other than Small Finance Banks, Payment Banks, and Local Area Banks), corresponding new banks, and the State Bank of India, as defined respectively under clauses (c), (da), and (nc) of Section 5 of the Banking Regulation Act, 1949. Paragraph 18(4) of these directions shall apply to all Non-Banking Financial Companies (including Housing Finance Companies) which are group entities of a bank operating in India.
+NOTE: Footnote 2: Amended w.e.f. December 05, 2025 vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) amendment Directions, 2025
+
+--- para 4 (part 1 of 4), page 3
+section: Chapter I – Preliminary > C. Definitions
+In these directions, unless the context otherwise requires, the terms herein shall bear the meanings assigned to them below: 
+(1) 'Agency Business' means an arrangement under which a bank or its group entity acts as an agent of a third-party product or service provider (TPPSP), without risk participation, to facilitate the sale of the latter's financial products or services (e.g., insurance, mutual fund, pension fund, etc.) to its own customers. Under agency business arrangement, the bank and the group entity shall enter into an agreement with a TPPSP for sale of only regulated financial products or services. The activities covered under agency business arrangements may inter-alia include marketing, sales, promotion, initial point of contact for redressal of grievance and other after-sale services related to the product or service 
+(1A) 'Assignee' shall have the same meaning as defined i ...
+NOTE: Footnote 3: Amended w.e.f. December 05, 2025 vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) Amendment Directions, 2025.
+NOTE: Footnote 4: Amended w.e.f. December 05, 2025, vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) Amendment Directions, 2025
+NOTE: Footnote 5: Amended w.e.f. December 05, 2025, vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) Amendment Directions, 2025
+
+--- para 4 (part 2 of 4), page 3
+section: Chapter I – Preliminary > C. Definitions
+(8) 'Financial Services Company' means a company engaged in the 'business of financial services'; Explanation: The 'business of financial services' shall include: 
+(i) the forms of business enumerated in clauses (a), (c), (d), (e) of sub-Section (1) of Section 6 of the Banking Regulation Act, 1949 and notified under clause (o) of sub-Section (1) of Section 6 of the Banking Regulation Act, 1949; 
+(ii) the forms of business enumerated in clause (c) and clause (f) of Section 45 I of Reserve Bank of India Act, 1934; 
+(iii) business of credit information as provided under the Credit Information Companies (Regulation) Act, 2005; 
+(iv) operation of a payment system as defined under the Payment and Settlement Systems Act, 2007; 
+(v) operation of a stock exchange, commodity exchange, derivatives exchange or other exchange of similar nature; 
+(vi) operation of a depository as provided under the De ...
+NOTE: Footnote 3: Amended w.e.f. December 05, 2025 vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) Amendment Directions, 2025.
+NOTE: Footnote 4: Amended w.e.f. December 05, 2025, vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) Amendment Directions, 2025
+NOTE: Footnote 5: Amended w.e.f. December 05, 2025, vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) Amendment Directions, 2025
+
+--- para 4 (part 3 of 4), page 3
+section: Chapter I – Preliminary > C. Definitions
+(xii) business of an authorised person as defined under the Foreign Exchange Management Act, 1999; and 
+(xiii) such other business as may be specified by RBI from time to time. 
+(9) 'Government Securities' shall have the same meaning as defined in the Government Securities Act, 2006; 
+(9A) 'Group entity' means an entity which is a subsidiary or joint venture or associate of a bank. The definition of a subsidiary, joint venture and associate for banks shall be as stated in the Accounting Standards of the Institute of Chartered Accountants of India. Entities held under NOFHC shall not be treated as group entities of a bank for the purpose of these directions 
+(10) 'Hire Purchase' shall have the same meaning as defined in the Hire Purchase Act, 1972; 
+(11) 'Investment Advisory Service' means the service offered by an investment adviser as defined in the SEBI (Investment Advisers) Regulation ...
+NOTE: Footnote 3: Amended w.e.f. December 05, 2025 vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) Amendment Directions, 2025.
+NOTE: Footnote 4: Amended w.e.f. December 05, 2025, vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) Amendment Directions, 2025
+NOTE: Footnote 5: Amended w.e.f. December 05, 2025, vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) Amendment Directions, 2025
+
+--- para 4 (part 4 of 4), page 3
+section: Chapter I – Preliminary > C. Definitions
+(17) 'Referral Services' means an arrangement under which a bank may refer its customers to a TPPSP by making available information about the financial products or services offered by the TPPSP. Note: Under referral arrangement, the bank shall neither be involved in any of the processes relating to the third-party products or services (TPPS) nor the name or brand of the bank shall feature in any of the product/service documents. No processes relating to TPPS shall either be integrated with the bank's platform/carried out within the premises of the bank (unless specifically permitted) or be accessible in the form of a micro-site or micro-application, except for an access link to redirect the customer to the TPPSP 
+(18) 'Subsidiary' means a subsidiary as defined in terms of the Accounting Standards of the Institute of Chartered Accountants of India.
+NOTE: Footnote 3: Amended w.e.f. December 05, 2025 vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) Amendment Directions, 2025.
+NOTE: Footnote 4: Amended w.e.f. December 05, 2025, vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) Amendment Directions, 2025
+NOTE: Footnote 5: Amended w.e.f. December 05, 2025, vide Reserve Bank of India (Commercial Banks- Undertaking of Financial Services) Amendment Directions, 2025
+
+
+BEFORE: a table, as raw text (149MD.pdf, page 17)
+========================================================================
+17 
+ 
+liable for all the aspects, including risk perspective related to the credit 
+proposal. If the CRO is not a part of the credit sanction process, their role 
+shall be limited to that of an adviser.  
+(ii) 
+In a PSB which does not follow committee approach for sanction of high 
+value credits, the CRO can only be an adviser in the sanction process and 
+shall not have any sanctioning power.  
+(iii) 
+The CRO in their role as an adviser shall be an invitee to the credit 
+sanction / approval committee without any voting rights in the proceedings 
+of such a committee.  
+F. Appointment of Chief Vigilance Officer 
+34. While recommending to the Government or Central Vigilance Commission name/s 
+of officer/s for appointment as Chief Vigilance Officer (CVO), a PSB shall consider 
+that the CVO may be called upon to handle enquiries against even the senior-
+most executives. Accordingly, a person in the rank of at least a General Manager 
+shall be the likely choice for the post of CVO.  
+35. The CVO shall not be allotted portfolio such Investment, Credit, Premises, Dead 
+Stock Stationery. However, the PSB may entrust the CVO with portfolios such as 
+Inspection and Audit, Accounts, Planning and Development, and Legal matters. 
+G. Appointment of Chief Financial Officer and Chief Technical Officer 
+36. As a PSB’s Chief Financial Officer (CFO) or Chief Technology Officer (CTO) in its 
+management structure plays a crucial role in strengthening and sustaining the risk 
+governance framework, 
+
+AFTER: the same table inside its paragraph
+========================================================================
+para 36, page 17
+As a PSB's Chief Financial Officer (CFO) or Chief Technology Officer (CTO) in its management structure plays a crucial role in strengthening and sustaining the risk governance framework, the PSB shall stipulate, at a minimum, the following qualifications and experience while inviting applications for these positions: 
+Role | Criteria (Minimum qualification and experience)
+Chief Financial Officer | Qualification: qualified Chartered Accountant. Experience: Fifteen years in overseeing financial operations, preferably accounting and taxation matters, in banks / large corporates / PSUs / FIs / financial services organizations, of which ten years shall be in banks / FIs (of which five years shall be at senior management level). 
+Role | Criteria (Minimum qualification and experience)
+Chief Technology Officer | Qualification: Engineering Graduate or MCA or equivalent qualification from a recognized University / Institution. Experience: Fifteen years of experience in relevant areas viz. Banking-IT related areas / projects involving IT Policy and Planning / Financial Networks and Applications / Financial Information Systems / Cyber Security Technologies / Payment Technologies, etc., of which five years shall be at senior management level. Provided that a PSB may prescribe additional qualifications and experience as they deem fit, taking into account the risk profile, size and scale of operations.

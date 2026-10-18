@@ -1,63 +1,40 @@
-from parse import PARA_START, parse_pages, size_chunks
+# pytest-v  (give  passed and fail cases)
+from parse import ITEM_START, PARA_START, join_lines, paragraph_text, split_long, tidy
 
 
-def test_paragraph_numbers_are_detected():
-    assert PARA_START.match("3.1 The bank shall").group(1) == "3.1"
-    assert PARA_START.match("12. Definitions").group(1) == "12"
-    assert PARA_START.match("2025 was a year") is None  # four digits: a year
+def test_paragraph_numbers_on_their_own_line_or_with_text():
+    assert PARA_START.match("4.").group(1) == "4"
+    assert PARA_START.match("16. With the issue of these Directions").group(1) == "16"
+    assert PARA_START.match("1949. The Act") is None  # four digits: a year, not a paragraph
+    assert PARA_START.match("4.1 The bank") is None   # a decimal is not a top-level paragraph
+    assert PARA_START.match("19A. Notwithstanding").groups() == ("19", "A")  # inserted paragraph
 
 
-def test_small_heading_joins_next_paragraph():
-    paras = [{"para": "4", "page": 2, "text": "4. Definitions"},
-             {"para": "4.1", "page": 2, "text": "x" * 300}]
-    out = size_chunks(paras)
-    assert len(out) == 1 and out[0]["text"].startswith("4. Definitions")
+def test_sub_items_are_recognised():
+    for marker in ["(1)", "(1A)", "(a)", "(iv)"]:
+        assert ITEM_START.match(marker + " text")
 
 
-def test_footnote_line_is_not_a_paragraph():
-    assert PARA_START.match("1 Inserted w.e.f. October 1, 2026, vide ...") is None
+def test_real_hyphens_are_kept_when_lines_are_joined():
+    assert join_lines(["under sub-", "section (1)"]) == "under sub-section (1)"
+    assert join_lines(["all Non-", "Banking Financial Companies"]) == "all Non-Banking Financial Companies"
+    assert join_lines(["the Banking", "Regulation Act"]) == "the Banking Regulation Act"
 
 
-def test_toc_footnote_and_page_number_are_removed():
-    page = "\n".join([
-        "Table of Contents",
-        "Chapter I- Preliminary ........................ 2",
-        "Introduction",
-        "These directions are issued under Section 35A of the Act. " * 4,
-        "5. All other expressions have the meaning in the Act. " * 4,
-        "Shares or Voting Rights) Amendment Directions, 2026 dated October 1, 2026",
-        "3",
-    ])
-    text = " ".join(p["text"] for p in parse_pages([(1, page)]))
-    assert "Table of Contents" not in text
-    assert "........" not in text
-    assert "Amendment Directions" not in text
-    assert "Introduction" in text
+def test_quotes_are_straightened_not_removed():
+    assert tidy("‘Bank’ means") == "'Bank' means"
 
 
-def test_heading_goes_with_the_paragraph_after_it():
-    page = "\n".join([
-        "1. First paragraph of the direction goes here and is long enough. " * 5,
-        "B. Applicability",
-        "2. Second paragraph starts after its heading and is long enough. " * 5,
-    ])
-    paras = parse_pages([(1, page)])
-    assert paras[0]["para"] == "1" and "Applicability" not in paras[0]["text"]
-    assert paras[1]["para"] == "2" and paras[1]["text"].startswith("B. Applicability")
+def test_item_marker_joins_its_text_and_suspended_hyphen_is_kept():
+    parts = [("", "In these directions:", 3), ("\n", "(1)", 3), ("", "'Amalgamation' means", 3),
+             ("", "pre- and post-sanction checks", 3)]
+    text = paragraph_text(parts)
+    assert "\n(1) 'Amalgamation' means" in text
+    assert "pre- and post-sanction" in text
 
 
-def test_sub_heading_like_D1_goes_with_next_paragraph():
-    page = "\n".join([
-        "14. Earlier paragraph that is long enough to stand alone here. " * 5,
-        "D.1 Single Counterparty",
-        "15. The sum of all the exposure values shall not be higher. " * 5,
-    ])
-    paras = parse_pages([(1, page)])
-    assert "Single Counterparty" not in paras[0]["text"]
-    assert paras[1]["para"] == "15"
-
-
-def test_merged_paragraphs_get_a_range_label():
-    paras = [{"para": "1", "page": 1, "text": "1. Short."},
-             {"para": "2", "page": 1, "text": "2. " + "y" * 300}]
-    assert size_chunks(paras)[0]["para"] == "1–2"
+def test_long_paragraph_splits_at_sub_items():
+    text = "Lead in:\n" + "\n".join(f"({i}) " + "x" * 300 for i in range(1, 11))
+    pieces = split_long(text, limit=1000)
+    assert len(pieces) > 1 and all(len(p) <= 1000 for p in pieces)
+    assert pieces[1].startswith("(")  # a new piece starts at a sub-item
