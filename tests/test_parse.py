@@ -38,3 +38,37 @@ def test_long_paragraph_splits_at_sub_items():
     pieces = split_long(text, limit=1000)
     assert len(pieces) > 1 and all(len(p) <= 1000 for p in pieces)
     assert pieces[1].startswith("(")  # a new piece starts at a sub-item
+
+
+
+def test_paragraph_number_without_space_and_two_letter_insertions():
+    assert PARA_START.match("13.The bank shall constitute").group(1) == "13"
+    assert PARA_START.match("428.[Deleted]").group(1) == "428"
+    assert PARA_START.match("219ZB. Without prejudice").groups() == ("219", "ZB")
+    assert PARA_START.match("4.1 The bank") is None
+
+
+def span(text, size, y):
+    return {"text": text, "size": size, "origin": (0, y)}
+
+
+def test_footnote_markers_must_be_small_and_raised():
+    from parse import is_marker
+    word = span("plus 350", 12, 100)
+    assert is_marker(span("2", 8, 97), 12, word)        # raised "2" after "350"
+    assert is_marker(span("vi", 8, 97), 12, word)       # roman marker
+    assert not is_marker(span("i", 8, 102), 12, word)   # lowered subscript, as in "Mi"
+    assert not is_marker(span("100", 9, 100), 12, span("150", 9, 100))  # small table numbers
+
+
+def test_deleted_paragraph_glued_to_previous_line_is_split():
+    from parse import GLUED_DELETED
+    m = GLUED_DELETED.match("cases pertaining to exporters. 428.[Deleted] .")
+    assert m.group(2).startswith("428.[Deleted]")
+
+
+def test_running_header_is_found():
+    from parse import running_headers
+    lines = [{"kind": "line", "page": p, "y": 0.05, "text": "Reserve Bank of India (X) Directions, 2026"}
+             for p in range(1, 11)] + [{"kind": "line", "page": 1, "y": 0.5, "text": "body"}]
+    assert running_headers(lines) == {"Reserve Bank of India (X) Directions, 2026"}

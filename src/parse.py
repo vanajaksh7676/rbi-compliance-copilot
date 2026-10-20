@@ -38,21 +38,29 @@ MAX_CHARS = 1800  # longer paragraphs are split at their sub-items
 
 # ---------- patterns ----------
 DOT_LEADER = re.compile(r"\.{5,}")                       # "Applicability ........ 3"
-PARA_START = re.compile(r"^\[?(\d{1,3})([A-Z]?)\.(?:\s+|$)")  # "4.", "4. In these", "19A." (inserted)
+# "4.", "4. In these", "19A." (inserted), and "13.The bank" (some PDFs leave out the space)
+PARA_START = re.compile(r"^\[?(\d{1,3})([A-Z]{0,2})\.(?:\s+|$|(?=[A-Z'\"‘“\[]))")
 ITEM_START = re.compile(r"^\((?:\d{1,3}[A-Z]?|[a-z]{1,2}|[ivxl]{1,6})\)\s*")  # "(1)", "(1A)", "(a)", "(iv)"
-# headings: "Chapter II", "Annex I", "A. Definitions", "B.4 Other ...", "[B1. Matters ..."
-HEADING = re.compile(r"^\[?(Chapter\b|Annex\b|[A-Z]\.\s|[A-Z]\.?\d+(?:\.\d+)*\.?\s)")
-ANNEX_NAME = re.compile(r"^Annex(?:ure)?\s*[IVXLC\d]*", re.IGNORECASE)
+# headings: "Chapter II", "CHAPTER II", "PART D:", "Annex I", "Appendix 1", "A. Definitions",
+# "B.4 Other ...", "[B1. Matters ..."
+HEADING = re.compile(r"^\[?(Chapter\b|CHAPTER\b|Part\b|PART\b|Annex|Appendix\b|[A-Z]\.\s|"
+                     r"[A-Z]\.?\d+(?:\.\d+)*\.?\s)")
+ANNEX_NAME = re.compile(r"^(?:Annex(?:ure)?|Appendix)\s*[IVXLC\d]*", re.IGNORECASE)
+CONTENTS = re.compile(r"^(Table of Contents|Contents|CONTENTS|INDEX)$")
+# footnote markers: small digits ("1", "12") or small roman numerals ("iv", "vii")
+GLUED_DELETED = re.compile(r"^(.*\S)\s+(\d{1,3}[A-Z]{0,2}\.\s*\[Deleted\].*)$")
+MARKER = re.compile(r"^(\d{1,3}|[ivxlc]{1,6})$")
 LETTERHEAD = re.compile(
-    r"^(RESERVE BANK OF INDIA|RBI/\S+|D[Oo][Rr]\.\S+|Table of Contents|"
+    r"^(_*RESERVE BANK OF INDIA_*|www\.rbi\.org\.in|RBI/\S+|D[Oo][Rr]\.\S+|Table of Contents|"
     r"(January|February|March|April|May|June|July|August|September|October|November|"
     r"December) \d{1,2}, \d{4})$")
 REF_NO = re.compile(r"^(RBI/|D[Oo][Rr]\.)")                 # "RBI/DOR/2025-26/148", "DoR.HOL.REC..."
 DEVANAGARI = re.compile(r"[ऀ-ॿ]")
 SIGNATURE_NAME = re.compile(r"^\([A-Z][A-Za-z.]+(?: [A-Z][A-Za-z.]+)+\)$")  # "(Scenta Joy)"
 DESIGNATION = re.compile(
-    r"^(Principal )?(Chief General Manager|General Manager|Executive Director|"
-    r"Deputy Governor)(-in-Charge)?$")
+    r"^\(?(Principal )?(Chief General Manager|General Manager|Executive Director|"
+    r"Deputy Governor)(-in-Charge)?\)?$")
+PLAIN_NAME = re.compile(r"^[A-Z][a-z.]+(?: [A-Z][A-Za-z.]*){1,3}$")  # "Vaibhav Chaturvedi"
 QUOTES = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"'})
 
 
@@ -63,6 +71,17 @@ def tidy(text: str) -> str:
 
 
 # ---------- 1. EXTRACT ----------
+def is_marker(span, body, ref=None):
+    """A footnote marker: small digits ("2") or roman numerals ("vi") raised above the
+    text next to it (ref). Small numbers in a table, or a lowered subscript such as the
+    "i" in "Mi", are not markers."""
+    if span["size"] >= body * 0.8 or not MARKER.match(span["text"].strip()):
+        return False
+    if ref is None:
+        return True
+    return span["size"] < ref["size"] * 0.8 and span["origin"][1] < ref["origin"][1] - 0.5
+
+
 def extract_lines(doc):
     """Every text line as a dict: page, y (0-1 down the page), text, size, bold, markers."""
     sizes = Counter()
@@ -76,73 +95,128 @@ def extract_lines(doc):
     lines = []
     for page_no, page in enumerate(doc, start=1):
         height = page.rect.height
+        page_lines = [line for block in page.get_text("dict")["blocks"]
+                      for line in block.get("lines", [])]
         tables = [t for t in page.find_tables().tables]
         table_boxes = [pymupdf.Rect(t.bbox) for t in tables]
 
         for t in tables:  # each table becomes one item placed where the table sits
-            rows = table_rows(t)
+            rows, markers = table_rows(t, page_lines, body)
             letterhead = any("RESERVE BANK OF INDIA" in r or REF_NO.match(r) for r in rows)
             if rows and not (page_no == 1 and letterhead):
                 lines.append({"page": page_no, "y": t.bbox[1] / height, "x": t.bbox[0], "kind": "table",
-                              "text": "\n".join(rows), "size": body, "bold": False, "markers": []})
+                              "text": "\n".join(rows), "size": body, "bold": False, "markers": markers})
 
-        for block in page.get_text("dict")["blocks"]:
-            for line in block.get("lines", []):
-                spans = [s for s in line["spans"] if s["text"].strip()]
-                if not spans or any(pymupdf.Rect(line["bbox"]).intersects(b) for b in table_boxes):
+        for line in page_lines:
+            spans = [s for s in line["spans"] if s["text"].strip()]
+            # a line belongs to a table only if its middle is inside the table; a line that
+            # just touches the table's edge is the next paragraph and must be kept
+            mid = pymupdf.Point((line["bbox"][0] + line["bbox"][2]) / 2, (line["bbox"][1] + line["bbox"][3]) / 2)
+            if not spans or any(box.contains(mid) for box in table_boxes):
+                continue
+            size = max(s["size"] for s in spans)
+            main = max(spans, key=lambda s: s["size"])  # the line's normal text
+            text, markers = "", []
+            y = spans[-1]["origin"][1] / height  # baseline of the line's main text
+            only_marker = (len(spans) == 1 and is_marker(spans[0], body)
+                           and spans[0]["origin"][1] / height < 0.45)
+            prev_end = None
+            for s in spans:
+                if (only_marker or (size >= body - 1.2 and is_marker(s, body, main))):
+                    markers.append(s["text"].strip())  # footnote marker inside body text
+                    prev_end = s["bbox"][2] if prev_end is not None else None  # no space for it
                     continue
-                size = max(s["size"] for s in spans)
-                text, markers = "", []
-                y = spans[-1]["origin"][1] / height  # baseline of the line's main text
-                only_marker = (len(spans) == 1 and spans[0]["size"] < body * 0.8
-                               and spans[0]["text"].strip().isdigit()
-                               and spans[0]["origin"][1] / height < 0.45)
-                prev_end = None
-                for s in spans:
-                    small_digits = s["size"] < body * 0.8 and s["text"].strip().isdigit()
-                    if small_digits and (size >= body - 1.2 or only_marker):
-                        markers.append(int(s["text"]))  # footnote marker inside body text
-                        continue
-                    # Some PDFs leave out the space between two pieces of text and just
-                    # leave a gap ("banks" + "are" -> "banksare"). Put the space back.
-                    gap = s["bbox"][0] - prev_end if prev_end is not None else 0
-                    if text and gap > s["size"] * 0.15 and not text.endswith(" ") \
-                            and not s["text"].startswith(" "):
-                        text += " "
-                    text += s["text"]
-                    prev_end = s["bbox"][2]
-                if only_marker:
-                    y += 0.012  # a raised marker belongs to the text right after it
-                lines.append({
-                    "page": page_no, "y": y, "x": line["bbox"][0], "kind": "line",
-                    "text": tidy(text), "size": size, "markers": markers,
-                    "bold": all("Bold" in s["font"] for s in spans if s["text"].strip()),
-                    "first_small_digits": spans[0]["text"].strip()
-                    if spans[0]["size"] < body * 0.8 and spans[0]["text"].strip().isdigit() else None,
-                })
+                # Some PDFs leave out the space between two pieces of text and just
+                # leave a gap ("banks" + "are" -> "banksare"). Put the space back.
+                gap = s["bbox"][0] - prev_end if prev_end is not None else 0
+                if text and gap > s["size"] * 0.15 and not text.endswith(" ") \
+                        and not s["text"].startswith(" "):
+                    text += " "
+                text += s["text"]
+                prev_end = s["bbox"][2]
+            if only_marker:
+                y += 0.012  # a raised marker belongs to the text right after it
+            lines.append({
+                "page": page_no, "y": y, "x": line["bbox"][0], "kind": "line",
+                "text": tidy(text), "size": size, "markers": markers,
+                "bold": all("Bold" in s["font"] for s in spans if s["text"].strip()),
+                "first_marker": spans[0]["text"].strip() if is_marker(spans[0], body) else None,
+            })
     # Reading order: top to bottom; text on the same visual row goes left to right
     lines.sort(key=lambda l: (l["page"], round(l["y"] * 200), l["x"]))
     return lines, body
 
 
-def table_rows(table):
-    """Table -> rows like 'Chief Financial Officer | Qualification: ...'."""
+def table_rows(table, page_lines, body):
+    """Table -> rows like 'Chief Financial Officer | Qualification: ...'.
+    PyMuPDF reads table cells without font sizes, so a raised footnote marker gets glued
+    to the number before it ("plus 350" + small "2" -> "plus 3502"). We find each small
+    marker inside the table, look at the text just before it, and cut the marker out."""
+    box = pymupdf.Rect(table.bbox)
+    glued, markers = [], []
+    for line in page_lines:
+        spans = [s for s in line["spans"] if s["text"].strip()]
+        for before, s in zip(spans, spans[1:]):
+            if is_marker(s, body, before) and box.intersects(pymupdf.Rect(s["bbox"])):
+                tail = before["text"].rstrip()[-12:]
+                if tail:
+                    glued.append((tail + s["text"].strip(), tail))
+                markers.append(s["text"].strip())
+        if len(spans) > 1 and is_marker(spans[0], body, spans[1]) and box.intersects(pymupdf.Rect(spans[0]["bbox"])):
+            markers.append(spans[0]["text"].strip())  # marker at the start of a cell line
+            glued.append(("\n" + spans[0]["text"].strip(), "\n"))
     rows = []
     for row in table.extract():
         cells = []
         for cell in row:
-            cell = tidy((cell or "").replace("\n", " "))
+            cell = "\n" + (cell or "")
+            for wrong, right in glued:
+                cell = cell.replace(wrong, right, 1)
+            cell = tidy(cell.replace("\n", " "))
             if cell and (not cells or cells[-1] != cell):  # skip empty and merged duplicates
                 cells.append(cell)
         if cells:
             rows.append(" | ".join(cells))
-    return rows
+    return rows, markers
 
 
 # ---------- 2. CLEAN ----------
+def norm(text):
+    """Text without dot leaders and page numbers, for comparing headings."""
+    return re.sub(r"[\s.]*\d*$", "", DOT_LEADER.sub(" ", text)).strip().lower()
+
+
+def contents_zone(lines):
+    """Line positions (start, end) of a table of contents that has no dot leaders.
+    Some PDFs list 'CHAPTER I – PRELIMINARY' / '1.' / 'Introduction' / '3' on separate
+    lines. The contents end where its first entry appears again as a real heading."""
+    for i, l in enumerate(lines):
+        if l["page"] > 5:
+            return None
+        if l["kind"] == "line" and CONTENTS.match(l["text"]):
+            first = next((norm(x["text"]) for x in lines[i + 1:i + 6]
+                          if x["kind"] == "line" and norm(x["text"]) and not MARKER.match(x["text"])), "")
+            for j in range(i + 2, len(lines)):
+                if lines[j]["page"] > l["page"] + 10:
+                    break
+                if first and lines[j]["kind"] == "line" and norm(lines[j]["text"]) == first:
+                    return i, j
+            return None
+    return None
+
+
+def running_headers(lines):
+    """Text repeated at the top or bottom of many pages, e.g. the direction's title in
+    small italics on every page. It is noise in the middle of a paragraph."""
+    pages = max(l["page"] for l in lines)
+    edge = Counter(l["text"] for l in lines
+                   if l["kind"] == "line" and l["text"] and (l["y"] < 0.1 or l["y"] > 0.92))
+    return {t for t, n in edge.items() if n >= max(3, pages * 0.3) and not t.isdigit()}
+
+
 def clean(lines, body):
     """Remove noise, collect footnotes.
-    Returns (clean lines, footnotes {number: text}, footnote pages {number: page})."""
+    Returns (clean lines, footnotes {marker: text}, footnote pages {marker: page})."""
     footnotes, note_pages, last_note, pending_note = {}, {}, None, None
     kept = []
 
@@ -153,11 +227,15 @@ def clean(lines, body):
                for p in toc_pages}
     toc_start = {}
     for l in lines:
-        if l["page"] in toc_pages and l["text"] == "Table of Contents":
+        if l["page"] in toc_pages and CONTENTS.match(l["text"]):
             toc_start[l["page"]] = l["y"]
+    zone = contents_zone(lines) if not toc_pages else None
+    headers = running_headers(lines)
 
-    for l in lines:
+    for i, l in enumerate(lines):
         text = l["text"]
+        if zone and zone[0] <= i < zone[1]:
+            continue  # table of contents without dot leaders
         if l["kind"] == "table":
             kept.append(l)
             continue
@@ -165,21 +243,21 @@ def clean(lines, body):
             if l["markers"]:
                 kept.append(l)  # a footnote marker on its own; it belongs to this paragraph
             continue
-        # page numbers at the top or bottom edge
+        # page numbers at the top or bottom edge, and running headers / footers
         if re.fullmatch(r"\d{1,3}", text) and (l["y"] < 0.12 or l["y"] > 0.88):
+            continue
+        if text in headers and (l["y"] < 0.1 or l["y"] > 0.92):
             continue
         # footnotes: small text in the lower part of the page
         if l["size"] < body - 1.2 and l["y"] > 0.45:
             m = re.match(r"^(\d{1,3})\s+(.*)", text)
-            if l["first_small_digits"] or m:
-                number = int(l["first_small_digits"] or m.group(1))
-                rest = text if l["first_small_digits"] else m.group(2)
-                if l["first_small_digits"]:
-                    rest = re.sub(rf"^{number}\s*", "", text) if text.startswith(str(number)) else text
+            if l["first_marker"] or m:
+                number = l["first_marker"] or m.group(1)
+                rest = re.sub(rf"^{re.escape(number)}\s*", "", text)
                 footnotes[number], note_pages[number] = tidy(rest), l["page"]
                 last_note, pending_note = number, None
-            elif re.fullmatch(r"\d{1,3}", text):
-                pending_note = int(text)  # marker on its own line; the text follows
+            elif MARKER.match(text):
+                pending_note = text  # marker on its own line; the text follows
             elif pending_note is not None:
                 footnotes[pending_note], note_pages[pending_note] = text, l["page"]
                 last_note, pending_note = pending_note, None
@@ -196,8 +274,18 @@ def clean(lines, body):
             continue
         if l["page"] == 1 and REF_NO.match(text):  # reference number line, maybe with the date
             continue
-        # signature block
-        if SIGNATURE_NAME.match(text) or DESIGNATION.match(text):
+        # signature block: "(Scenta Joy)", or a plain name right above "(Chief General Manager)"
+        if DESIGNATION.match(text):
+            if kept and kept[-1]["kind"] == "line" and kept[-1]["page"] == l["page"] \
+                    and PLAIN_NAME.match(kept[-1]["text"]) and not kept[-1]["bold"]:
+                kept.pop()
+            continue
+        if SIGNATURE_NAME.match(text):
+            continue
+        glued = GLUED_DELETED.match(text)
+        if glued:  # "... of exporters. 428.[Deleted]" -> two lines
+            kept.append({**l, "text": glued.group(1)})
+            kept.append({**l, "text": glued.group(2), "markers": [], "bold": False})
             continue
         kept.append(l)
     return kept, footnotes, note_pages
@@ -235,8 +323,10 @@ def paragraphs(lines):
         text = l["text"]
         if l["kind"] == "table":
             if current is None:
-                current = start(f"{zone} (intro)".strip() if zone else "preamble", l["page"])
+                current = start(intro_label(zone, last_number), l["page"])
             current["parts"].append(("\n", text, l["page"]))
+            current["markers"] += l["markers"]
+            current["after_table"] = True
             heading_open = False
             continue
 
@@ -252,11 +342,11 @@ def paragraphs(lines):
                 else:
                     chapter += " " + text
                 continue
-            if text.startswith("Annex"):
+            if ANNEX_NAME.match(text) and text.startswith(("Annex", "Appendix")):
                 zone = ANNEX_NAME.match(text).group(0).strip()
                 chapter, last_number = "", 0
                 section = text[len(zone):].strip(" -–:")
-            elif text.startswith("Chapter"):
+            elif text.upper().startswith(("CHAPTER", "PART")):
                 chapter, section = text, ""
             else:
                 section = text
@@ -285,15 +375,23 @@ def paragraphs(lines):
                 current["markers"] += l["markers"]
                 continue
         if current is None:
-            current = start(f"{zone} (intro)".strip() if zone else "preamble", l["page"])
+            current = start(intro_label(zone, last_number), l["page"])
         # sub-items such as "(1)" or "(iv)" start on a new line inside the paragraph
-        brk = "\n" if ITEM_START.match(text) else ""
+        brk = "\n" if ITEM_START.match(text) or (current["parts"] and current.get("after_table")) else ""
+        current["after_table"] = False
         current["parts"].append((brk, text, l["page"]))
         current["page_end"] = l["page"]
         current["markers"] += l["markers"]
     if current:
         paras.append(current)
     return paras
+
+
+def intro_label(zone, last_number):
+    """Label for text that has no paragraph number, e.g. a 'Background:' box under a heading."""
+    if zone:
+        return f"{zone} (intro)"
+    return f"note after para {last_number}" if last_number else "preamble"
 
 
 def paragraph_text(parts):
@@ -303,7 +401,8 @@ def paragraph_text(parts):
     joined = join_lines(pieces)
     joined = re.sub(r" (\(\d{1,3}[A-Z]\) ')", r"\n\1", joined)  # "(1A) 'Assignee'" starts a line
     joined = re.sub(r"(\(\w{1,6}\))\s*\n\s*", r"\1 ", joined)  # "(1)\n'Amalgamated" -> "(1) 'Amalgamated"
-    joined = re.sub(r"[._]{5,}", "____", joined)  # blank lines to fill in, on forms
+    joined = re.sub(r"[._]{5,}", "____", joined)
+    joined = re.sub(r"(\w) +([.,;:])(?=\s|$)", r"\1\2", joined)  # "2026 ." -> "2026."  # blank lines to fill in, on forms
     # "sub- broker" -> "sub-broker", but keep "pre- and post-sanction" as written
     joined = re.sub(r"(\w)- (?!(?:and|or|to)\b)([a-z])", r"\1-\2", joined)
     return re.sub(r"\n\s+", "\n", joined).strip()

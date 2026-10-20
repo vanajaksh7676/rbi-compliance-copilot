@@ -1,0 +1,7 @@
+doc_id,effective_from,replaced_by,replaced_from,scope,note
+397MD7DCC951F9F014A738C60E0FBC1A73D70,2027-04-01,,,,New Standardised Approach for credit risk (para 2)
+MD39857992A3DBE7946619F0F76DF81E472CF,2027-04-01,,,,New ECL-based provisioning rules (para 2)
+472MDACBA450D67234F52BA2983DA6AED9DFC,2027-04-01,,,,New market risk capital rules (para 2)
+151MD,,397MD7DCC951F9F014A738C60E0FBC1A73D70,2027-04-01,part,credit risk rules
+151MD,,472MDACBA450D67234F52BA2983DA6AED9DFC,2027-04-01,part,market risk rules in Chapter IV Section D
+164MD,,MD39857992A3DBE7946619F0F76DF81E472CF,2027-04-01,all,whole direction

@@ -219,3 +219,6 @@ Cost of the fixes: about 2x tokens per answer (about 1,900–2,600 tokens), stil
 - Commit `embeddings.npy` (about 34 MB, under GitHub's 100 MB limit) once the index is final.
 - OpenAI usage costs money: keep a monthly spending limit set in the OpenAI dashboard.
 - Groq (fallback): about 8,000 tokens/minute and 200,000/day; use `gpt-oss-20b` while building if switching back.
+
+## phase 4
+Phase 4 done. Parser v3: fixed glued footnote markers (153MD “3502” became 350, roman v/vi markers), the table of contents without dot leaders and the repeated page header (397MD), “13.The” with no space (170MD), 219ZA-style numbers (154MD), signature lines and letterhead. Added currency.py and data/currency.csv: warnings for “not yet in force”, “being replaced”, “amended” and “expired temporary rule”, all made by code. Each source sent to the LLM has a Status line. 13 tests pass. Re-downloaded all PDFs after losing data/raw; removed the duplicate 165MD and 174MD; 156MD added; 5,801 chunks before cleanup. Test results: FCNR(B) answer gives 350 bps plus an expiry warning; ECL answer says it applies from 1 April 2027. Open issue: 158MD para 114 missing.
