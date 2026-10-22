@@ -1,0 +1,6 @@
+{
+ "questions": 30,
+ "retrieval hit@5": "96% (24/25)",
+ "retrieval MRR": "0.94",
+ "tokens": 0
+}

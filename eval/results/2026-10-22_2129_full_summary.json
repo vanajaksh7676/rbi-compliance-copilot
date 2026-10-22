@@ -1,0 +1,12 @@
+{
+ "questions": 30,
+ "retrieval hit@5": "96% (24/25)",
+ "retrieval MRR": "0.94",
+ "correct citation": "92% (23/25)",
+ "correct facts": "96% (24/25)",
+ "correct refusals": "100% (5/5)",
+ "false refusals": "4% (1/25)",
+ "currency warning shown": "80% (4/5)",
+ "faithful (LLM judge)": "87% (26/30)",
+ "tokens": 138046
+}

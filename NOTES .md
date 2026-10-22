@@ -222,3 +222,8 @@ Cost of the fixes: about 2x tokens per answer (about 1,900–2,600 tokens), stil
 
 ## phase 4
 Phase 4 done. Parser v3: fixed glued footnote markers (153MD “3502” became 350, roman v/vi markers), the table of contents without dot leaders and the repeated page header (397MD), “13.The” with no space (170MD), 219ZA-style numbers (154MD), signature lines and letterhead. Added currency.py and data/currency.csv: warnings for “not yet in force”, “being replaced”, “amended” and “expired temporary rule”, all made by code. Each source sent to the LLM has a Status line. 13 tests pass. Re-downloaded all PDFs after losing data/raw; removed the duplicate 165MD and 174MD; 156MD added; 5,801 chunks before cleanup. Test results: FCNR(B) answer gives 350 bps plus an expiry warning; ECL answer says it applies from 1 April 2027. Open issue: 158MD para 114 missing.
+
+Phase 5 done. 30 questions (25 answerable, 5 not in the corpus).
+Final run: hit@5 96%, MRR 0.94 (0.83 without reranker), citation 96%, facts 100%, refusals 100%, false refusals 0%, warnings 100%, faithfulness 100%. Range across runs: faithfulness 80–100%, citation 92–96%.
+Fixes found through evaluation: (1) the judge wasn’t seeing the Status line and notes, so the evaluation itself was wrong (80% → 87%); (2) the prompt made the LLM refuse rules not yet in force (q25), fixed with “never refuse just because a rule is not in force yet”.
+Known issues: q24 (the generic commencement paragraph isn’t retrieved); occasional claims about what other sources don’t say (q23)

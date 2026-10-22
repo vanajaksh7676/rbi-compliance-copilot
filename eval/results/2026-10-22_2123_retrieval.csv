@@ -1,0 +1,31 @@
+id,type,question,hit@5,rr,top_result
+q01,answer,What is the maximum age up to which a person can continue as MD & CEO of a private sector bank?,1,1.0,149MD para 49
+q02,answer,What are the minimum and maximum age limits for non-executive directors of a private sector bank?,1,1.0,149MD para 44
+q03,answer,What age range must a candidate meet to be an elected director on the board of a public sector bank?,1,1.0,149MD para 25
+q04,answer,What risk weight applies to claims guaranteed by a State Government?,1,1.0,151MD para 32
+q05,answer,What risk weight applies to consumer credit exposures such as personal loans?,1,1.0,151MD para 71
+q06,answer,What is the capital charge for specific risk on equity positions under market risk?,1,1.0,151MD para 196
+q07,answer,What is the interest rate ceiling on FCNR(B) deposits of three to five years?,1,1.0,153MD para 32
+q08,answer,What amount of single rupee term deposit counts as a bulk deposit for commercial banks?,1,1.0,153MD para 6
+q09,answer,"If an FCNR(B) deposit is renewed some days after maturity, up to how many days of delay does the bank still pay the rate prevailing on the maturity date (or on the renewal date, whichever is lower)?",1,1.0,153MD para 35
+q10,answer,What share of monthly household income can loan repayments take up for microfinance borrowers?,1,1.0,154MD para 67
+q11,answer,What is the maximum repayment tenor for a gold metal loan given to jewellers other than exporters?,1,1.0,154MD para 60K
+q12,answer,How much land must be available before a bank disburses funds to an infrastructure project under the PPP model?,1,1.0,154MD para 80
+q13,answer,Within how many months must control be established for acquisition finance through a series of transactions?,1,1.0,154MD para 170N
+q14,answer,What is the exposure limit of a bank to a single counterparty?,1,1.0,158MD para 15
+q15,answer,What is the exposure limit of a bank to a group of connected counterparties?,1,1.0,158MD para 16
+q16,answer,How much of a company's paid-up share capital can a bank hold as shares under Section 19(2)?,1,1.0,158MD para 96
+q17,answer,What compensation must a bank pay for each day of delay in settling claims related to safe deposit lockers?,1,1.0,170MD para 322
+q18,answer,Within how many days must a bank report a breach of investment limits to the Reserve Bank?,1,1.0,148MD para 38H
+q19,answer,"Can a bank group invest 20 per cent or more in a Category I or II AIF scheme, and up to what limit?",1,1.0,148MD para 38B
+q20,answer,How is Adjusted Profit After Tax defined for dividend declaration by banks?,1,1.0,387MD1 para 4
+q21,answer,When did the Undertaking of Financial Services Directions come into force?,1,1.0,148MD para 2
+q22,answer,What risk weight applies to the regulatory retail portfolio under the new standardised approach for credit risk?,1,1.0,397MD7 para 14
+q23,answer,What risk weight floor applies when a rating is classified as Issuer Not Cooperating?,1,1.0,397MD7 para 31
+q24,answer,"From when do the ECL-based Asset Classification, Provisioning and Income Recognition Directions apply?",0,0.0,MD3985 para 23
+q25,answer,What are the Stage 1 and Stage 2 ECL prudential floors for secured retail loans?,1,0.5,MD3985 para 90
+r01,refuse,What is the current repo rate?,,,163MD para 141
+r02,refuse,Who is the current Governor of the Reserve Bank of India?,,,149MD para 2
+r03,refuse,What is the GST rate on bank service charges?,,,170MD para 81
+r04,refuse,What are SEBI's limits on mutual fund expense ratios?,,,472MDA para 44
+r05,refuse,What solvency ratio must insurance companies maintain under IRDAI rules?,,,148MD para 61

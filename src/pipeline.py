@@ -27,7 +27,7 @@ class Copilot:
         # 3. sources = only the chunks the answer actually cites
         used = sorted({int(n) for n in re.findall(r"\[(\d+)\]", answer) if 0 < int(n) <= len(chunks)})
         cited = [chunks[n - 1] for n in used]
-        sources = [{"n": n, "title": c["title"], "para": c["para"], "page": c["page"],
+        sources = [{"n": n, "doc_id": c["doc_id"], "title": c["title"], "para": c["para"], "page": c["page"],
                     "status": c["status"], "url": f"{c['pdf_url']}#page={c['page']}" if c["pdf_url"] else ""}
                    for n, c in zip(used, cited)]
         found = NOT_FOUND not in answer
@@ -35,7 +35,7 @@ class Copilot:
             "answer": answer,
             "sources": sources,
             "warnings": self.currency.warnings(cited, on) if found else [],  # made by code
-            "contexts": [c["text"] for c in chunks],  # for evaluation in Phase 5
+            "contexts": [f"{c['title']}, para {c['para']}\nStatus: {c['status']}\n{c['text']}"+ "".join(f"\nNote: {n}" for n in c.get("notes", [])) for c in chunks],
             "tokens": tokens,
             "found": found,
             "date": on.isoformat(),

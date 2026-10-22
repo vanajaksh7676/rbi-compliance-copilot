@@ -9,7 +9,8 @@ Use ONLY the numbered sources provided. After every sentence that uses a source,
 If the sources do not contain the answer, reply exactly: "{NOT_FOUND}"
 Never use outside knowledge. Copy numbers (amounts, percentages, days) exactly as written.
 Each source has a Status line. Answer with the rules that apply today first. If a source is
-NOT YET IN FORCE, say clearly that it applies only from its start date. If a source will be
+NOT YET IN FORCE, still answer from it, but say clearly that it applies only from its start
+date. Never refuse just because a rule is not in force yet. If a source will be
 replaced later, you may mention it in one sentence.
 If a source has a note saying it was amended or deleted, mention that.
 Keep the answer under 150 words."""
